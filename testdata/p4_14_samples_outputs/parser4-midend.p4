@@ -60,7 +60,7 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
         verify(false, error.StackOutOfBounds);
         transition reject;
     }
-    state parse_ethernet {
+    @name(".parse_ethernet") state parse_ethernet {
         packet.extract<ethernet_t>(hdr.ethernet);
         transition select(hdr.ethernet.etherType) {
             16w0x8100: parse_vlan;
@@ -72,13 +72,13 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
             default: accept;
         }
     }
-    state parse_ipv4 {
+    @name(".parse_ipv4") state parse_ipv4 {
         packet.extract<ipv4_t>(hdr.ipv4);
         transition select(hdr.ipv4.fragOffset, hdr.ipv4.protocol) {
             default: accept;
         }
     }
-    state parse_mpls {
+    @name(".parse_mpls") state parse_mpls {
         tmp_0 = packet.lookahead<bit<24>>();
         transition select(tmp_0[0:0]) {
             1w0: parse_mpls_not_bos;
@@ -110,7 +110,7 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
             default: accept;
         }
     }
-    state parse_mpls_bos {
+    @name(".parse_mpls_bos") state parse_mpls_bos {
         packet.extract<mpls_t>(hdr.mpls_bos);
         tmp_2 = packet.lookahead<bit<4>>();
         transition select(tmp_2) {
@@ -118,7 +118,7 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
             default: accept;
         }
     }
-    state parse_mpls_not_bos {
+    @name(".parse_mpls_not_bos") state parse_mpls_not_bos {
         packet.extract<mpls_t>(hdr.mpls[32w0]);
         transition parse_mpls1;
     }
@@ -133,7 +133,7 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
     state parse_mpls_not_bos3 {
         transition stateOutOfBound;
     }
-    state parse_vlan {
+    @name(".parse_vlan") state parse_vlan {
         packet.extract<vlan_tag_t>(hdr.vlan_tag_[32w0]);
         transition select(hdr.vlan_tag_[32w0].etherType) {
             16w0x8100: parse_vlan1;
@@ -160,7 +160,7 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
     state parse_vlan2 {
         transition stateOutOfBound;
     }
-    state start {
+    @name(".start") state start {
         transition parse_ethernet;
     }
 }

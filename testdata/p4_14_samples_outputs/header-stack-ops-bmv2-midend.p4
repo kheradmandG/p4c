@@ -45,7 +45,7 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
         verify(false, error.StackOutOfBounds);
         transition reject;
     }
-    state parse_h2 {
+    @name(".parse_h2") state parse_h2 {
         packet.extract<h2_t>(hdr.h2[32w0]);
         transition select(hdr.h2[32w0].next_hdr_type) {
             8w2: parse_h21;
@@ -88,11 +88,11 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
     state parse_h25 {
         transition stateOutOfBound;
     }
-    state parse_h3 {
+    @name(".parse_h3") state parse_h3 {
         packet.extract<h3_t>(hdr.h3);
         transition accept;
     }
-    state start {
+    @name(".start") state start {
         packet.extract<h1_t>(hdr.h1);
         transition select(hdr.h1.next_hdr_type) {
             8w2: parse_h2;
